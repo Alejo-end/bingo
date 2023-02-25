@@ -2,37 +2,48 @@ import * as React from "react"
 import {
   ChakraProvider,
   Box,
-  Text,
-  Link,
   VStack,
-  Code,
   Grid,
   theme,
 } from "@chakra-ui/react"
 import { ColorModeSwitcher } from "./ColorModeSwitcher"
-import { Logo } from "./Logo"
+import Game, { Player } from "./components/Game"
 
-export const App = () => (
-  <ChakraProvider theme={theme}>
-    <Box textAlign="center" fontSize="xl">
-      <Grid minH="100vh" p={3}>
-        <ColorModeSwitcher justifySelf="flex-end" />
-        <VStack spacing={8}>
-          <Logo h="40vmin" pointerEvents="none" />
-          <Text>
-            Edit <Code fontSize="xl">src/App.tsx</Code> and save to reload.
-          </Text>
-          <Link
-            color="teal.500"
-            href="https://chakra-ui.com"
-            fontSize="2xl"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn Chakra
-          </Link>
-        </VStack>
-      </Grid>
-    </Box>
-  </ChakraProvider>
-)
+const bingoBoard = [
+  [1, 2, 3, 4, 5],
+  [6, 7, 8, 9, 10],
+  [11, 12, 13, 14, 15],
+  [16, 17, 18, 19, 20],
+  [21, 22, 23, 24, 25],
+]
+
+export const App = () => {
+  const [numbersCalled, setNumbersCalled] = React.useState<number[]>([]);
+
+  const handleNumberCall = (number: number) => {
+    setNumbersCalled(prevNumbersCalled => [...prevNumbersCalled, number]);
+  };
+
+  const handleOnNewGame = () => {
+    setNumbersCalled([]);
+    handleNumberCall(13);
+  };
+  const player1: Player = {
+    name: "Player 1",
+    board: bingoBoard,
+    numbersCalled: numbersCalled,
+  };
+
+  return (
+    <ChakraProvider theme={theme}>
+      <Box textAlign="center" fontSize="xl">
+        <Grid minH="100vh" p={3}>
+          <ColorModeSwitcher justifySelf="flex-end" />
+          <VStack spacing={8}>
+            <Game onNewGame={handleOnNewGame} players={[player1, player1]}/>
+          </VStack>
+        </Grid>
+      </Box>
+    </ChakraProvider>
+  );
+}
