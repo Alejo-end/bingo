@@ -30,8 +30,8 @@ export const App = () => {
   };
   const player1: Player = {
     name: "Player 1",
-    board: bingoBoard,
     numbersCalled: numbersCalled,
+    bingoCount: 0,
   };
 
   return (
@@ -40,7 +40,7 @@ export const App = () => {
         <Grid minH="100vh" p={3}>
           <ColorModeSwitcher justifySelf="flex-end" />
           <VStack spacing={8}>
-            <Game onNewGame={handleOnNewGame} players={[player1, player1]}/>
+            <Game onNewGame={handleOnNewGame} players={[player1]} board={bingoBoard}/>
           </VStack>
         </Grid>
       </Box>

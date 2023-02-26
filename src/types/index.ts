@@ -9,7 +9,7 @@ export enum conferencePhrases {
    'can we take this offline?',
    'is ____ on the call?',
    'Could you share this slides afterwards?',
-   'can somebody grant presenter rights?',
+   'can someone grant presenter rights?',
    'can you email that to everyone?',
    'free play',
    'sorry, I had problems logging in',

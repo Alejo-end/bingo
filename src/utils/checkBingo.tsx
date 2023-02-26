@@ -1,3 +1,5 @@
+import { BingoPattern } from "../components/Game";
+
 export interface BingoBoardConfig {
   rows: number[][];
   columns: number[][];
@@ -5,49 +7,67 @@ export interface BingoBoardConfig {
   diag2: number[];
 }
 
-function checkBingo(config: BingoBoardConfig, numbersCalled: number[]): boolean {
-  const calledSet = new Set(numbersCalled);
-  
+function checkBingo(config: BingoBoardConfig, numbersCalled: Set<number>): BingoPattern[] {
+  const bingos: number[] = [];
+
   // Check rows
-  for (let row of config.rows) {
-    const rowSet = new Set(row);
-    if (isSubset(calledSet, rowSet)) {
-      return true;
+  for (let i = 0; i < config.rows.length; i++) {
+    let bingo = true;
+    for (let j = 0; j < config.rows[i].length; j++) {
+      if (!numbersCalled.has(config.rows[i][j])) {
+        bingo = false;
+        break;
+      }
+    }
+    if (bingo) {
+      bingos.push(i);
     }
   }
-  
+
   // Check columns
-  for (let col of config.columns) {
-    const colSet = new Set(col);
-    if (isSubset(calledSet, colSet)) {
-      return true;
+  for (let i = 0; i < config.columns.length; i++) {
+    let bingo = true;
+    for (let j = 0; j < config.columns[i].length; j++) {
+      if (!numbersCalled.has(config.columns[i][j])) {
+        bingo = false;
+        break;
+      }
+    }
+    if (bingo) {
+      bingos.push(i + config.rows.length);
     }
   }
-  
-  // Check diagonal 1
-  const diag1Set = new Set(config.diag1);
-  if (isSubset(calledSet, diag1Set)) {
-    return true;
-  }
-  
-  // Check diagonal 2
-  const diag2Set = new Set(config.diag2);
-  if (isSubset(calledSet, diag2Set)) {
-    return true;
-  }
-  
-  // No bingo pattern found
-  return false;
-}
 
-function isSubset(superset: Set<any>, subset: Set<any>): boolean {
-  for (let elem of subset) {
-    if (!superset.has(elem)) {
-      return false;
+  // Check diagonals
+  let diag1Bingo = true;
+  let diag2Bingo = true;
+  for (let i = 0; i < config.diag1.length; i++) {
+    if (!numbersCalled.has(config.diag1[i])) {
+      diag1Bingo = false;
+    }
+    if (!numbersCalled.has(config.diag2[i])) {
+      diag2Bingo = false;
     }
   }
-  return true;
-}
+  if (diag1Bingo) {
+    bingos.push(config.rows.length + config.columns.length);
+  }
+  if (diag2Bingo) {
+    bingos.push(config.rows.length + config.columns.length + 1);
+  }
 
+  return bingos.map((bingo) => {
+    if (bingo < config.rows.length) {
+      return { type: 'row', index: bingo };
+    } else if (bingo < config.rows.length + config.columns.length) {
+      return { type: 'column', index: bingo - config.rows.length };
+    } else if (bingo === config.rows.length + config.columns.length) {
+      return { type: 'diag1', index: 0 };
+    } else {
+      return { type: 'diag2', index: 0 };
+    }
+  }
+  );
+}
 
 export default checkBingo;
