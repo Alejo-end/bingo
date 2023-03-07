@@ -6,8 +6,10 @@ import {
   Grid,
   theme,
 } from "@chakra-ui/react"
-import { ColorModeSwitcher } from "./ColorModeSwitcher"
-import Game, { Player } from "./components/Game"
+import { ColorModeSwitcher } from "./components/common/ColorModeSwitcher"
+import Game from "./components/Game"
+import { Player } from "./types"
+import './styles.css'
 
 const bingoBoard = [
   [1, 2, 3, 4, 5],
@@ -18,7 +20,7 @@ const bingoBoard = [
 ]
 
 export const App = () => {
-  const [numbersCalled, setNumbersCalled] = React.useState<number[]>([]);
+  const [numbersCalled, setNumbersCalled] = React.useState<number[]>([13]);
 
   const handleNumberCall = (number: number) => {
     setNumbersCalled(prevNumbersCalled => [...prevNumbersCalled, number]);
@@ -31,17 +33,18 @@ export const App = () => {
   const player1: Player = {
     name: "Player 1",
     numbersCalled: numbersCalled,
-    bingoCount: 0,
+    bingoCount: [],
   };
 
+
   return (
-    <ChakraProvider theme={theme}>
+    <ChakraProvider theme={theme} >
       <Box textAlign="center" fontSize="xl">
         <Grid minH="100vh" p={3}>
           <ColorModeSwitcher justifySelf="flex-end" />
           <VStack spacing={8}>
-            <Game onNewGame={handleOnNewGame} players={[player1]} board={bingoBoard}/>
-          </VStack>
+            <Game onNewGame={handleOnNewGame} players={[player1]} board={bingoBoard} />
+          </VStack>  
         </Grid>
       </Box>
     </ChakraProvider>
