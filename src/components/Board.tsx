@@ -15,15 +15,15 @@ const Board: React.FC<BoardProps> = ({ board, numbersCalled, onNumberCall }) => 
             onNumberCall(number);
         }
     };
-    
+
     return (
-    <Grid templateColumns={`repeat(${board.length}, 1fr)` as any} gap={2}>
-            {board.map((row, i) =>
-                row.map((number, j) => (
-                    <Square key={`${i}-${j}`} number={number} onClick={() => handleNumberClick(number)} numbersCalled={numbersCalled}/>
-                ))
-            )}
-        </Grid>
+            <Grid templateColumns={`repeat(${board.length}, 1fr)` as any} gap={2}>
+                {board.map((row, i) =>
+                    row.map((number, j) => (
+                        <Square key={`${i}-${j}`} number={number} onClick={() => handleNumberClick(number)} numbersCalled={numbersCalled} />
+                    ))
+                )}
+            </Grid>
     );
 };
 
