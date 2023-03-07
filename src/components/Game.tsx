@@ -1,19 +1,11 @@
-import React, { useState } from 'react';
-import { Box, Button, Flex, Heading, ScaleFade, Text } from '@chakra-ui/react';
+import React, { useState, useEffect } from 'react';
+import { Box, Button, Flex, Heading, ScaleFade, Text, useColorMode } from '@chakra-ui/react';
 import Board from './Board';
 import { getBingoBoardConfig } from '../utils/getBingoBoard';
 import checkBingo from '../utils/checkBingo';
-
-export interface Player {
-    name: string;
-    numbersCalled: number[];
-    bingoCount: number;
-}
-
-export interface BingoPattern {
-    type: 'row' | 'column' | 'diag1' | 'diag2';
-    index: number;
-}
+import { Player, BingoPattern } from '../types';
+import ShowerOfEmojis from './game/ShowerOfEmojis';
+import ParallaxText from './game/ParallelText';
 
 interface GameProps {
     players: Player[];
@@ -23,76 +15,95 @@ interface GameProps {
 
 const Game: React.FC<GameProps> = ({ players, onNewGame, board }) => {
     const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
-    const [numbersCalled, setNumbersCalled] = useState<number[]>([]);
+    const [numbersCalled, setNumbersCalled] = useState<number[]>([13]);
     const [winningPlayers, setWinningPlayers] = useState<Player[]>([]);
+    const [patterns, setPatterns] = useState<BingoPattern[]>([]);
+    const [isBingo, setIsBingo] = useState<boolean>(false);
 
-    const handleNumberCall = (number: number) => {
-        setNumbersCalled([...numbersCalled, number]);
+    // Check if a new pattern has been completed and add it to the patterns state
+    useEffect(() => {
+        const currentBoardConfig = getBingoBoardConfig(board);
+        const newPatterns: BingoPattern[] = checkBingo(currentBoardConfig, new Set(numbersCalled));
+        console.log(currentBoardConfig, newPatterns)
+        setPatterns(newPatterns);
+        setIsBingo(false)
+    }, [board, numbersCalled]);
 
-        const currentBoard = board;
-        const currentBoardConfig = getBingoBoardConfig(currentBoard);
-
-        //add numbersCalled to player
-        let playerNumbers = [...players];
-        playerNumbers[currentPlayerIndex].numbersCalled = [...numbersCalled, number];
-
-
-        const newWinningPlayers: Player[] = [];
-        for (const player of playerNumbers) {
-            const patterns: BingoPattern[] = checkBingo(currentBoardConfig, new Set(player.numbersCalled)); // call updated checkBingo with player's numbersCalled
-            console.log('patterns', patterns)
-            if (patterns.length > 0) { // if there are any winning patterns
-                console.log('patterns', patterns)
-                player.bingoCount++;
-                if (player.bingoCount === 3) { // if player has reached maximum of 6 bingos
-                    setWinningPlayers([player]);
-                    return; // stop the game
-                } else {
-                    newWinningPlayers.push(player); // add current player to winning players array
-                }
+    // Check if a new bingo has been completed
+    useEffect(() => {
+        const currentPlayer = players[currentPlayerIndex];
+        const newBingoCount = patterns.length;
+        console.log(newBingoCount, currentPlayer);
+        if (newBingoCount > currentPlayer.bingoCount.length) {
+            setIsBingo(true);
+            currentPlayer.bingoCount = patterns;
+            if (currentPlayer.numbersCalled.length > 24) {
+                setWinningPlayers([currentPlayer]);
             }
         }
-        if (newWinningPlayers.length > 0) {
-            setWinningPlayers(newWinningPlayers);
-        } else {
-            const nextPlayerIndex = (currentPlayerIndex + 1) % players.length;
-            setCurrentPlayerIndex(nextPlayerIndex);
-        }
+    }, [currentPlayerIndex, patterns, players]);
+
+    // Call this function when a number is called
+    const handleNumberCall = (number: number) => {
+        setNumbersCalled((prevNumbers) => [...prevNumbers, number]);
+        currentPlayer.numbersCalled.push(number);
+        console.log(number, numbersCalled, currentPlayer.numbersCalled, currentPlayer.bingoCount)
     };
 
-
+    // Call this function when a new game is started
     const handleNewGameClick = () => {
         setCurrentPlayerIndex(0);
-        setNumbersCalled([]);
+        setNumbersCalled([13]);
         setWinningPlayers([]);
+        setPatterns([]);
         onNewGame();
     };
 
+    // Get the current player object
+    const currentPlayer = players[currentPlayerIndex]!;
+
+    // Check if the game is over
+    const gameOver =
+        winningPlayers.length > 0 &&
+        currentPlayer.bingoCount.length >= 6 &&
+        numbersCalled.length > 24;
+
+
+    const colorMode = useColorMode()
     return (
         <>
             <Box p={4}>
-                <Heading>Bingo!</Heading>
-                {numbersCalled.length > 24 ? (
+                {gameOver ? (
                     <ScaleFade initialScale={0.3} in={true}>
                         <Flex direction="column" alignItems="center">
-                            <Text fontSize="2xl" fontWeight="bold" mb={2}>
-                                {winningPlayers.filter(p => p.numbersCalled.length > 24).map(p => p.name).join(' and ')} Bingo Winner{winningPlayers.length > 1 ? 's' : ''}!
-                            </Text>
-                            <Button onClick={handleNewGameClick}>Start New Game</Button>
+                            <ShowerOfEmojis />
+                            <Box backgroundColor="blue.900" p={20} border="4px solid white" borderRadius={20} >
+                                <Heading as="h1" fontFamily={'Climate Crisis'} color="white">
+                                    Bingo!
+                                </Heading>
+                                <Text fontSize="2xl" fontWeight="bold" fontFamily="Epilogue" mb={2} color="white">
+                                    {winningPlayers.map((p) => p.name).join(' and ')}{' '}
+                                    {winningPlayers.length > 1 ? 'are' : 'is'} the Winner!
+                                </Text>
+                                <Button onClick={handleNewGameClick} fontFamily="Epilogue"  color={colorMode.colorMode === 'light' ? "black" : "white"} _hover={{ color: "gray.300" }} size="lg">Start New Game</Button>
+                            </Box>
                         </Flex>
                     </ScaleFade>
                 ) : (
                     <>
-                        <Text mb={2} fontWeight={600}>Current Player: {players[currentPlayerIndex].name}</Text>
-                        <br />
-                        <Board board={board} numbersCalled={numbersCalled} onNumberCall={handleNumberCall} />
-                        {winningPlayers.length > 0 && (
-                            <ScaleFade initialScale={0.3} in={true}>
-                                <Text fontSize="2xl" fontWeight="bold" mb={2}>
-                                    {winningPlayers.map(p => p.name).join(' and ')} Bingo{winningPlayers.length > 1 ? 's' : ''}!
-                                </Text>
-                            </ScaleFade>
+
+                        {isBingo && (
+                            <Heading lineHeight='tall' position="absolute" top={0} left={0} zIndex={-1}>
+                                <ParallaxText children={'Bingo_'} baseVelocity={0.25} />
+                                <ParallaxText children={"Player 1_"} baseVelocity={0.25} />
+                            </Heading>
+
                         )}
+                        <Board board={board} numbersCalled={players[currentPlayerIndex].numbersCalled} onNumberCall={handleNumberCall} />
+                        <br />
+                        <Text fontFamily="Epilogue" mb={2} fontWeight={600}>Current Player: {currentPlayer.name}</Text>
+                        <br/>
+                        <Button onClick={handleNewGameClick} fontFamily="Epilogue"  color={colorMode.colorMode === 'light' ? "black" : "white"} _hover={{ color: "gray.300" }} size="lg">Restart</Button>
                     </>
                 )}
             </Box>

@@ -1,4 +1,4 @@
-import { BingoBoardConfig, BingoPattern, Player } from "../types";
+import { BingoBoardConfig, BingoPattern } from "../types";
 
 
 function checkBingo(config: BingoBoardConfig, numbersCalled: Set<number>): BingoPattern[] {
