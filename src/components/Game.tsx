@@ -103,7 +103,6 @@ const Game: React.FC<GameProps> = ({ players, onNewGame, board }) => {
                         <br />
                         <Text fontFamily="Epilogue" mb={2} fontWeight={600}>Current Player: {currentPlayer.name}</Text>
                         <br/>
-                        <Button onClick={handleNewGameClick} fontFamily="Epilogue"  color={colorMode.colorMode === 'light' ? "black" : "white"} _hover={{ color: "gray.300" }} size="lg">Restart</Button>
                     </>
                 )}
             </Box>

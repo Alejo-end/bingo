@@ -5,11 +5,13 @@ import {
   VStack,
   Grid,
   theme,
+  IconButton,
 } from "@chakra-ui/react"
 import { ColorModeSwitcher } from "./components/common/ColorModeSwitcher"
 import Game from "./components/Game"
 import { Player } from "./types"
 import './styles.css'
+import { FaRedo } from "react-icons/fa"
 
 const bingoBoard = [
   [1, 2, 3, 4, 5],
@@ -40,11 +42,22 @@ export const App = () => {
   return (
     <ChakraProvider theme={theme} >
       <Box textAlign="center" fontSize="xl">
-        <Grid minH="100vh" p={3}>
-          <ColorModeSwitcher justifySelf="flex-end" />
+      <Grid minH="100vh" p={3}>
+        <VStack justifySelf="flex-end" alignItems="flex-end">
+          <ColorModeSwitcher/>
+          <IconButton
+            size="md"
+            fontSize="lg"
+            variant="ghost"
+            color="current"
+            marginLeft="2"
+            onClick={handleOnNewGame}
+            icon={<FaRedo />}
+            aria-label={`Restart`}
+          /></VStack>
           <VStack spacing={8}>
             <Game onNewGame={handleOnNewGame} players={[player1]} board={bingoBoard} />
-          </VStack>  
+          </VStack>
         </Grid>
       </Box>
     </ChakraProvider>
