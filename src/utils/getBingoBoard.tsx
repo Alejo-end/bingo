@@ -1,4 +1,4 @@
-import { BingoBoardConfig } from "./checkBingo";
+import { BingoBoardConfig } from "../types";
 
 export const getBingoBoardConfig = (board: number[][]): BingoBoardConfig => {
     const numRows = board.length;

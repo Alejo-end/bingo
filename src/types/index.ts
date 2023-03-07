@@ -1,9 +1,9 @@
 export enum conferencePhrases {
    '(Child noises in the background)',
    'Hello, hello?',
-   'I need to jump in another call',
+   'I need to jump-in another call',
    'can everyone mute go on mute',
-   'could you olease get closer to the mic?',
+   'could you please get closer to the mic?',
    '(loud painful echo / feedback)',
    'Next slide, please',
    'can we take this offline?',
@@ -25,3 +25,23 @@ export enum conferencePhrases {
    'sorry, i was on mute',
    'can you repeat, please?',
 }
+
+export interface Player {
+   name: string;
+   numbersCalled: number[];
+   bingoCount: BingoPattern[];
+}
+
+export interface BingoPattern {
+   type: 'row' | 'column' | 'diag1' | 'diag2';
+   index: number;
+   player?: Player;
+}
+
+
+export interface BingoBoardConfig {
+   rows: number[][];
+   columns: number[][];
+   diag1: number[];
+   diag2: number[];
+ }

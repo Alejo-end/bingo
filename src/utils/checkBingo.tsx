@@ -1,11 +1,5 @@
-import { BingoPattern } from "../components/Game";
+import { BingoBoardConfig, BingoPattern, Player } from "../types";
 
-export interface BingoBoardConfig {
-  rows: number[][];
-  columns: number[][];
-  diag1: number[];
-  diag2: number[];
-}
 
 function checkBingo(config: BingoBoardConfig, numbersCalled: Set<number>): BingoPattern[] {
   const bingos: number[] = [];
@@ -33,6 +27,7 @@ function checkBingo(config: BingoBoardConfig, numbersCalled: Set<number>): Bingo
         break;
       }
     }
+
     if (bingo) {
       bingos.push(i + config.rows.length);
     }
@@ -62,11 +57,11 @@ function checkBingo(config: BingoBoardConfig, numbersCalled: Set<number>): Bingo
     } else if (bingo < config.rows.length + config.columns.length) {
       return { type: 'column', index: bingo - config.rows.length };
     } else if (bingo === config.rows.length + config.columns.length) {
-      return { type: 'diag1', index: 0 };
+      return { type: 'diag1', index: 0};
     } else {
       return { type: 'diag2', index: 0 };
     }
-  }
+  },
   );
 }
 
